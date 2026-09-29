@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\WelcomeUserMail;
+use App\Jobs\SendWelcomeEmailJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends Controller
 {
@@ -27,7 +26,7 @@ class RegisterController extends Controller
 
         $this->sendWelcomeEmail($user, $validated);
 
-        return back()->with('success', '¡Usuario registrado con éxito! Correo de bienvenida enviado.');
+        return back()->with('success', '¡Usuario registrado con éxito! Correo de bienvenida enviado en segundo plano.');
     }
 
     protected function validateUser(Request $request): array
@@ -54,6 +53,6 @@ class RegisterController extends Controller
 
     protected function sendWelcomeEmail(User $user, array $validated): void
     {
-        Mail::to($user->email)->send(new WelcomeUserMail($validated));
+        SendWelcomeEmailJob::dispatch($user);
     }
 }
